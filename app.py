@@ -1,8 +1,10 @@
-from flask import Flask # Realizando a importação do Framework flask
-from flask_restful import Resource, Api  # Flask-RESTful is an extension for Flask that adds support for quickly building REST APIs. It is a lightweight abstraction that works with your existing ORM/libraries.
+# Realizando a importação do Framework flask
+# jsonify: É uma função que vai converter a saídas para JSON para ser retornado ao browser
+from flask import Flask, jsonify
+from flask_restful import Resource, Api, reqparse  # Flask-RESTful is an extension for Flask  that adds support for quickly building REST APIs. 
 from flask_mongoengine import MongoEngine  # ORM utilizada para realizar a integração com o Banco de Dados
 
-app = Flask(__name__) # Criando a Aplicação Flask (Padrão encontrado na Doc)
+app = Flask(__name__)  # Start objeto, Criando a Aplicação Flask (Padrão encontrado na Doc)
 
 app.config['MONGODB_SETTINGS'] = {  # Conexão com o Banco de dados
     'db': 'users',
@@ -12,11 +14,42 @@ app.config['MONGODB_SETTINGS'] = {  # Conexão com o Banco de dados
     'password': 'admin'
 }
 
-api = Api(app) # "app" significa o objeto da aplicação flask na qual será extendido para restfull api e o MongoEngine
+_user_parser = reqparse.RequestParser()
+_user_parser.add_argument('first_name',
+                           type=str,
+                           required=True,
+                           help="This field cannot be blank"
+                           )
+
+_user_parser.add_argument('last_name',
+                           type=str,
+                           required=True,
+                           help="This field cannot be blank"
+                           )
+
+_user_parser.add_argument('cpf',
+                           type=str,
+                           required=True,
+                           help="This field cannot be blank"
+                           )
+
+_user_parser.add_argument('email',
+                           type=str,
+                           required=True,
+                           help="This field cannot be blank"
+                           )
+
+_user_parser.add_argument('birth_date',
+                           type=str,
+                           required=True,
+                           help="This field cannot be blank"
+                           )
+
+api = Api(app)  # "app" significa o objeto da aplicação flask na qual será extendido para restfull api e o MongoEngine
 db = MongoEngine(app)
 
 
-class UserModel(db.Document): # Declaração da Classe na qual irá se conectar com o Banco de Dados.
+class UserModel(db.Document):  # Declaração da Classe na qual irá se conectar com o Banco de Dados.
     cpf = db.StringField(required = True, unique = True)
     first_name = db.StringField(required = True)
     last_name = db.StringField(required = True)
@@ -27,11 +60,15 @@ class UserModel(db.Document): # Declaração da Classe na qual irá se conectar 
 # Endpoint criados a partir do restfull para get and post no banco
 class Users(Resource):  
     def get(self):
+        # return jsonify(UserModel.objects())   Teste conexão Banco. 
         return {"message": "user 1"}
 
 class User(Resource):
     def post(self):
-        return {"message": "teste"}
+        data = _user_parser.parse_args()
+        UserModel(**data).save()
+        #return data
+        #return {"message": "teste"}
 
     def get(self, cpf):
         return {"message": "CPF"}
