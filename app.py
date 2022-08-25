@@ -3,10 +3,14 @@
 from flask import Flask, jsonify
 from flask_restful import Resource, Api, reqparse  # Flask-RESTful is an extension for Flask  that adds support for quickly building REST APIs. 
 from flask_mongoengine import MongoEngine  # ORM utilizada para realizar a integração com o Banco de Dados
+from mongoengine import NotUniqueError
+import re  # Regular Expression  
 
-app = Flask(__name__)  # Start objeto, Criando a Aplicação Flask (Padrão encontrado na Doc)
+# Start objeto, Criando a Aplicação Flask (Padrão encontrado na Doc)
+app = Flask(__name__)  
 
-app.config['MONGODB_SETTINGS'] = {  # Conexão com o Banco de dados
+# Conexão com o Banco de dados
+app.config['MONGODB_SETTINGS'] = {  
     'db': 'users',
     'port': 27017,
     'host': 'mongodb',
@@ -45,11 +49,12 @@ _user_parser.add_argument('birth_date',
                            help="This field cannot be blank"
                            )
 
-api = Api(app)  # "app" significa o objeto da aplicação flask na qual será extendido para restfull api e o MongoEngine
+# "app" significa o objeto da aplicação flask na qual será extendido para restfull api e o MongoEngine
+api = Api(app)  
 db = MongoEngine(app)
 
-
-class UserModel(db.Document):  # Declaração da Classe na qual irá se conectar com o Banco de Dados.
+# Declaração da Classe na qual irá se conectar com o Banco de Dados.
+class UserModel(db.Document):  
     cpf = db.StringField(required = True, unique = True)
     first_name = db.StringField(required = True)
     last_name = db.StringField(required = True)
@@ -64,9 +69,47 @@ class Users(Resource):
         return {"message": "user 1"}
 
 class User(Resource):
+
+    def validate_cpf(self, cpf):
+
+        # Has the correct mask?
+        if not re.match(r'\d{3}\.\d{3}\.\d{3}.\d{2}', cpf):
+            return False
+
+        # Grab only numbers
+        numbers = [int(digit) for digit in cpf if digit.isdigit()]
+
+        # Dows it have 11 digits ?
+        if len(numbers) != 11 or len(set(numbers)) == 1:
+            return False
+
+        # Validate first digit after -
+        sum_of_products = sum(a*b for a, b in zip(numbers[0:9],
+                                                  range(10, 1, -1)))
+        expected_digit = (sum_of_products * 10 % 11) % 10
+        if numbers[9] != expected_digit:
+            return False
+
+        # Validate second digit after -
+        sum_of_products = sum(a*b for a, b in zip(numbers[0:10],
+                                                  range(11, 1, -1)))
+        expected_digit = (sum_of_products * 10 % 11) % 10
+        if numbers[10] != expected_digit:
+            return False
+
+        return True
+
     def post(self):
         data = _user_parser.parse_args()
-        UserModel(**data).save()
+        
+        if not self.validate_cpf(data["cpf"]):
+            return {"message": "CPF is invalid!"}, 400
+        
+        try: 
+            response = UserModel(**data).save()
+            return {"message": "User %s succefully created!" % response.id}
+        except NotUniqueError:
+            return {"message": "CPF already exists in database!"}, 400
         #return data
         #return {"message": "teste"}
 
