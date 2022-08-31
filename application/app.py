@@ -1,22 +1,11 @@
 # Realizando a importação do Framework flask
 # jsonify: É uma função que vai converter a saídas para JSON para ser retornado ao browser
-from flask import Flask, jsonify
-from flask_restful import Resource, Api, reqparse  # Flask-RESTful is an extension for Flask  that adds support for quickly building REST APIs. 
-
+from flask import jsonify
+from flask_restful import Resource, reqparse  # Flask-RESTful is an extension for Flask  that adds support for quickly building REST APIs.
 from mongoengine import NotUniqueError
-import re  # Regular Expression  
+from .model import UserModel
+import re  # Regular Expression
 
-# Start objeto, Criando a Aplicação Flask (Padrão encontrado na Doc)
-app = Flask(__name__)  
-
-# Conexão com o Banco de dados
-app.config['MONGODB_SETTINGS'] = {  
-    'db': 'users',
-    'port': 27017,
-    'host': 'mongodb',
-    'username': 'admin',
-    'password': 'admin'
-}
 
 _user_parser = reqparse.RequestParser()
 _user_parser.add_argument('first_name',
@@ -48,12 +37,6 @@ _user_parser.add_argument('birth_date',
                            required=True,
                            help="This field cannot be blank"
                            )
-
-# "app" significa o objeto da aplicação flask na qual será extendido para restfull api e o MongoEngine
-api = Api(app)
-
-
-
 
 
 # Endpoint criados a partir do restfull para get and post no banco
@@ -115,10 +98,3 @@ class User(Resource):
 
         return {"message": "User does not exist in database!"}, 400
 
-# Utilização das classes endpoints.
-api.add_resource(Users, '/users') 
-api.add_resource(User, '/user', '/user/<string:cpf>')
-
-# Parte de execução do Script.
-if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0")

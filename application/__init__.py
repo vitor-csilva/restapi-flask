@@ -3,6 +3,7 @@ from flask_restful import Api
 from .db import init_db
 from .app import User, Users
 
+
 # Start objeto, Criando a Aplicação Flask (Padrão encontrado na Doc)
 # "app" significa o objeto da aplicação flask na qual será extendido para restfull api e o MongoEngine
 def create_app(config):
@@ -12,6 +13,6 @@ def create_app(config):
     init_db(app)
 
     # Utilização das classes endpoints.
-    api.add_resource(Users, '/users') 
+    api.add_resource(Users, '/users')
     api.add_resource(User, '/user', '/user/<string:cpf>')
     return app
