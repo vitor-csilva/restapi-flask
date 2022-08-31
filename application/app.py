@@ -43,7 +43,7 @@ _user_parser.add_argument('birth_date',
 class Users(Resource):  
     def get(self):
         return jsonify(UserModel.objects())  # Teste conexão Banco. 
-        #return {"message": "user 1"}
+        # return {"message": "user 1"}
 
 class User(Resource):
 
@@ -87,8 +87,8 @@ class User(Resource):
             return {"message": "User %s succefully created!" % response.id}
         except NotUniqueError:
             return {"message": "CPF already exists in database!"}, 400
-        #return data
-        #return {"message": "teste"}
+        # return data
+        # return {"message": "teste"}
 
     def get(self, cpf):
         response = UserModel.objects(cpf=cpf)
@@ -97,4 +97,3 @@ class User(Resource):
             return jsonify(response)
 
         return {"message": "User does not exist in database!"}, 400
-
