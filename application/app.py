@@ -2,7 +2,7 @@
 # jsonify: É uma função que vai converter a saídas para JSON para ser retornado ao browser
 from flask import Flask, jsonify
 from flask_restful import Resource, Api, reqparse  # Flask-RESTful is an extension for Flask  that adds support for quickly building REST APIs. 
-from flask_mongoengine import MongoEngine  # ORM utilizada para realizar a integração com o Banco de Dados
+
 from mongoengine import NotUniqueError
 import re  # Regular Expression  
 
@@ -50,23 +50,17 @@ _user_parser.add_argument('birth_date',
                            )
 
 # "app" significa o objeto da aplicação flask na qual será extendido para restfull api e o MongoEngine
-api = Api(app)  
-db = MongoEngine(app)
+api = Api(app)
 
-# Declaração da Classe na qual irá se conectar com o Banco de Dados.
-class UserModel(db.Document):  
-    cpf = db.StringField(required = True, unique = True)
-    first_name = db.StringField(required = True)
-    last_name = db.StringField(required = True)
-    email = db.EmailField(required=True)
-    birth_date = db.DateTimeField(required = True)
+
+
 
 
 # Endpoint criados a partir do restfull para get and post no banco
 class Users(Resource):  
     def get(self):
-        # return jsonify(UserModel.objects())   Teste conexão Banco. 
-        return {"message": "user 1"}
+        return jsonify(UserModel.objects())  # Teste conexão Banco. 
+        #return {"message": "user 1"}
 
 class User(Resource):
 
@@ -114,7 +108,12 @@ class User(Resource):
         #return {"message": "teste"}
 
     def get(self, cpf):
-        return {"message": "CPF"}
+        response = UserModel.objects(cpf=cpf)
+
+        if response:
+            return jsonify(response)
+
+        return {"message": "User does not exist in database!"}, 400
 
 # Utilização das classes endpoints.
 api.add_resource(Users, '/users') 
