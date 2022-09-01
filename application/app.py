@@ -42,8 +42,8 @@ _user_parser.add_argument('birth_date',
 # Endpoint criados a partir do restfull para get and post no banco
 class Users(Resource):  
     def get(self):
-        return jsonify(UserModel.objects())  # Teste conexão Banco. 
-        # return {"message": "user 1"}
+        return jsonify(UserModel.objects())  # Retorna todos os usuários inseridos no Banco 
+        # return {"message": "user 1"} -> Teste
 
 class User(Resource):
 

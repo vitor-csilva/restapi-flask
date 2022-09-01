@@ -4,8 +4,8 @@ from .db import init_db
 from .app import User, Users
 
 
-# Start objeto, Criando a Aplicação Flask (Padrão encontrado na Doc)
-# "app" significa o objeto da aplicação flask na qual será extendido para restfull api e o MongoEngine
+# app, Start objeto, Criando a Aplicação Flask (Padrão encontrado na Doc)
+# api, "app" significa o objeto da aplicação flask na qual será extendido para restfull api e o MongoEngine
 def create_app(config):
     app = Flask(__name__)
     api = Api(app)

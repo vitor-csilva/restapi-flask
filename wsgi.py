@@ -1,7 +1,7 @@
 from application import create_app
 import os
 
-
+# Inicialização da API.
 if os.getenv('FLASK_ENV') == "development":
     app = create_app('config.DevConfig')
 else:
