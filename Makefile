@@ -1,4 +1,4 @@
-APP = restapi
+APP = comunidadedevops-restapi
 
 test:
 	#@flake8 . --exclude .venv 
@@ -10,5 +10,7 @@ compose:
 
 heroku:
 	@heroku container:login
-	@heroku container:push -a comunidadedevops-restapi web
-	@heroku container:release -a comunidadedevops-restapi web
+	#O export abaixo só é necessário caso esteja utilizando MAC com Apple Silicon(M1 ou M2)
+	@export DOCKER_DEFAULT_PLATFORM=linux/amd64  
+	@heroku container:push -a $(APP) web
+	@heroku container:release -a $(APP) web
