@@ -6,7 +6,7 @@ from mongoengine import NotUniqueError
 from .model import UserModel
 import re  # Regular Expression
 
-
+#reqparse responsável por fazer o parsing\análise dos dados.
 _user_parser = reqparse.RequestParser()
 _user_parser.add_argument('first_name',
                            type=str,
