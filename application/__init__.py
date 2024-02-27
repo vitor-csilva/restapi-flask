@@ -13,8 +13,8 @@ def create_app(config):
     init_db(app)
 
     # Utilização das classes endpoints.
-    api.add_resource(Users, '/users')
-    api.add_resource(User, '/user', '/user/<string:cpf>')
-    api.add_resource(HealthCheck, '/health') 
+    api.add_resource(Users, "/users")
+    api.add_resource(User, "/user", "/user/<string:cpf>")
+    api.add_resource(HealthCheck, "/health")
 
     return app

@@ -9,5 +9,6 @@ class UserModel(db.Document):
     email = db.EmailField(required=True)
     birth_date = db.DateTimeField(required=True)
 
+
 class HealthCheckModel(db.Document):
     status = db.StringField(required=True)
