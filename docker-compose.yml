@@ -7,7 +7,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin
-    restart: always
+    restart: unless-stopped
 
   api:
     build:
@@ -20,7 +20,7 @@ services:
       - MONGODB_HOST=mongodb
       - MONGODB_USER=admin
       - MONGODB_PASSWORD=admin
-    restart: always
+    restart: unless-stopped
     depends_on:
       - mongodb
     volumes:
