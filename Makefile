@@ -1,4 +1,4 @@
-APP = comunidadedevops-restapi
+APP = restapi-flask
 
 test:
 	@bandit -r . -x '*/.venv/*','*/tests/*'
@@ -17,6 +17,7 @@ setup-dev:
   		--for=condition=ready pod \
   		--selector=app.kubernetes.io/component=controller \
   		--timeout=270s
+# bitnami/mongodb nao disponivel para computadores com chips ARM ate o momento. 
 	@helm upgrade --install \
 		--set auth.rootPassword="root" \
 		--set image.tag=5.0.8 \
@@ -28,6 +29,14 @@ setup-dev:
 
 teardown-dev:
 	@kind delete clusters kind 
+
+deploy-dev:
+	@docker build -t $(APP):latest .
+	@kind load docker-image $(APP):latest
+	@kubectl apply -f kubernetes/manifests
+	@kubectl rollout restart deploy restapi-flask
+
+dev: setup-dev deploy-dev
 
 # heroku:
 # 	@heroku container:login
